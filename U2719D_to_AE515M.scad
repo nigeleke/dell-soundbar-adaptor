@@ -1,54 +1,128 @@
-barWidth = 230; // 230
-
-barHeightBack = 5;
-barHeightFront = 8;
+barLength = 230; // 230
 barDepth = 20;
 
-backHeight = 55;
 backDepth = 5;
-backWidth = 80;
+backHeight = 55;
 
-gapHeight = 15;
-gapWidth = 70;
+frontHeight = 8;
+frontJoinHeight = 6;
 
-backOffset = (barWidth - 2 * backWidth - gapWidth) / 2;
+gapLength = 70;
+gapBase = 15;
 
-module barEnd() {
+gripLength = 42;
+gripDepth = 7;
+gripHeight = 5;
+
+gripSlideLength = 20;
+gripSlideDepth = 1;
+gripSlideHeight = 1;
+
+module barProfile() {
     polygon([
-    [0, 0],
-    [0, barHeightBack],
-    [barDepth, barHeightFront],
-    [barDepth, 0]
+        [0, 0],
+        [barDepth, 0],
+        [barDepth, frontHeight],
+        [backDepth, frontJoinHeight],
+        [backDepth, backHeight],
+        [0, backHeight]
     ]);
 }
 
 module bar() {
-    linear_extrude(height = barWidth)
-        barEnd();
+    linear_extrude(barLength) barProfile();
 }
 
-module back() {
-    cube([backWidth, backDepth, backHeight]);
+module gapProfile() {
+    polygon([
+        [-1, gapBase],
+        [backDepth + 1, gapBase],
+        [backDepth + 1, backHeight + 1],
+        [-1, backHeight + 1]
+    ]);
 }
 
 module gap() {
-    cube([gapWidth, backDepth, gapHeight]);
+    translate([0,0,(barLength - gapLength) / 2.0])
+        linear_extrude(gapLength) gapProfile();
+}
+
+module gripInsetProfile() {
+    polygon([
+        [0, 0],
+        [gripDepth + 2, 0],
+        [gripDepth + 2, 1],
+        [0, 1]
+    ]);
+}
+
+module gripInset() {
+    linear_extrude(gripLength + 2) gripInsetProfile();
+}
+
+module gripSlideProfile() {
+    polygon([
+        [0, 0],
+        [gripSlideDepth + 0.2, 0],
+        [gripSlideDepth + 0.2, gripSlideHeight + 0.2],
+        [0, gripSlideHeight + 0.2]
+    ]);
+}
+
+module gripSlide() {
+    translate([0,0,-0.1])
+        linear_extrude(gripSlideLength + 0.1) gripSlideProfile();
+}
+
+module gripBlockProfile() {
+    polygon([
+        [0, 0],
+        [gripDepth, 0],
+        [gripDepth, gripHeight],
+        [0, gripHeight]
+    ]);
+}
+
+module gripBlock() {
+    difference() {
+        linear_extrude(gripLength) gripBlockProfile();
+        translate([-0.1, 1.0, 0])
+            union() {
+                gripSlide();
+                translate([gripDepth - gripSlideDepth, 0, 0]) gripSlide();
+            };
+    }
+}
+
+module grip() {
+    color("red")
+    union() {
+        gripInset();
+        translate([1, 0, 1]) gripBlock();
+    }
+}
+
+module adaptor() {
+    difference() {
+        bar();
+        union() {
+            translate([10, -0.1, 28]) grip();
+            translate([10, -0.1, 177]) grip();
+            gap();
+        }
+    }
+}
+
+module original() {
+    color("blue")
+    rotate([-90,0,0])
+    translate([barLength / 2.0, 4, 10.4])
+    import("soundbar-v1.stl");
 }
 
 //difference() {
-union() {
-    rotate([90,0,90]) bar();
-    translate([0, 0, 0]) {
-        translate([backOffset, 0, 0]) back();
-        translate([backOffset + backWidth, 0, 0]) gap();
-        translate([backOffset + backWidth + gapWidth, 0, 0]) back();
-    }    
-}
+    rotate([90,0,90]) adaptor();
+//    original();
+//}
 
-//union() {
-//    color("blue")
-//    rotate([-90,0,0])
-//    translate([(barWidth-1)/2,4,10]) //5,8])
-//    import("C:/Users/me/Downloads/soundbar-v1.stl");
-//}
-//}
+//rotate([90,0,90]) adaptor();
