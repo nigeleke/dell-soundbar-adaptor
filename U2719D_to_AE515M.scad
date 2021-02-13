@@ -1,14 +1,15 @@
-barLength = 230; // 230
+barLength = 230;
 barDepth = 20;
 
-backDepth = 5;
-backHeight = 55;
+backDepth = 3;
+backHeight = 40;
 
 frontHeight = 8;
 frontJoinHeight = 6;
 
-gapLength = 70;
 gapBase = 15;
+midGapLength = 70;
+sideGapLength = 30;
 
 gripLength = 42;
 gripDepth = 7;
@@ -42,9 +43,16 @@ module gapProfile() {
     ]);
 }
 
-module gap() {
-    translate([0,0,(barLength - gapLength) / 2.0])
-        linear_extrude(gapLength) gapProfile();
+module gap(length) {
+    linear_extrude(length) gapProfile();
+}
+
+module gaps() {
+    union() {
+        translate([0, 0, -0.1]) gap(sideGapLength + 0.1);
+        translate([0, 0, (barLength - midGapLength) / 2.0]) gap(midGapLength);
+        translate([0, 0, barLength - sideGapLength]) gap(sideGapLength + 0.1);
+    }
 }
 
 module gripInsetProfile() {
@@ -102,13 +110,17 @@ module grip() {
     }
 }
 
+module grips() {
+    translate([10, -0.1, 28]) grip();
+    translate([10, -0.1, 177]) grip();
+}
+
 module adaptor() {
     difference() {
         bar();
         union() {
-            translate([10, -0.1, 28]) grip();
-            translate([10, -0.1, 177]) grip();
-            gap();
+            grips();
+            gaps();
         }
     }
 }
@@ -124,5 +136,3 @@ module original() {
     rotate([90,0,90]) adaptor();
 //    original();
 //}
-
-//rotate([90,0,90]) adaptor();
