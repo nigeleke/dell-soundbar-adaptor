@@ -7,8 +7,9 @@ backHeight = 40;
 frontHeight = 8;
 frontJoinHeight = 6;
 
-gapBase = 15;
+midGapBase = 15;
 midGapLength = 70;
+sideGapBase = frontJoinHeight;
 sideGapLength = 30;
 
 gripLength = 42;
@@ -34,24 +35,24 @@ module bar() {
     linear_extrude(barLength) barProfile();
 }
 
-module gapProfile() {
+module gapProfile(base) {
     polygon([
-        [-1, gapBase],
-        [backDepth + 1, gapBase],
+        [-1, base],
+        [backDepth + 1, base],
         [backDepth + 1, backHeight + 1],
         [-1, backHeight + 1]
     ]);
 }
 
-module gap(length) {
-    linear_extrude(length) gapProfile();
+module gap(base, length) {
+    linear_extrude(length) gapProfile(base);
 }
 
 module gaps() {
     union() {
-        translate([0, 0, -0.1]) gap(sideGapLength + 0.1);
-        translate([0, 0, (barLength - midGapLength) / 2.0]) gap(midGapLength);
-        translate([0, 0, barLength - sideGapLength]) gap(sideGapLength + 0.1);
+        translate([0, 0, -0.1]) gap(sideGapBase, sideGapLength + 0.1);
+        translate([0, 0, (barLength - midGapLength) / 2.0]) gap(midGapBase, midGapLength);
+        translate([0, 0, barLength - sideGapLength]) gap(sideGapBase, sideGapLength + 0.1);
     }
 }
 
