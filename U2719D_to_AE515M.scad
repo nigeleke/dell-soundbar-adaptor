@@ -1,11 +1,11 @@
 barLength = 230;
-barDepth = 20;
+barDepth = 17;
 
 backDepth = 3;
 backHeight = 40;
 
-frontHeight = 8;
-frontJoinHeight = 6;
+frontHeight = 7;
+frontJoinHeight = 3.5;
 
 midGapBase = 15;
 midGapLength = 70;
@@ -14,11 +14,11 @@ sideGapLength = 30;
 
 gripLength = 42;
 gripDepth = 7;
-gripHeight = 5;
+gripHeight = 4.5;
 
 gripSlideLength = 20;
-gripSlideDepth = 1;
-gripSlideHeight = 1;
+gripSlideDepth = 1.5;
+gripSlideHeight = 1.5;
 
 module barProfile() {
     polygon([
@@ -112,8 +112,8 @@ module grip() {
 }
 
 module grips() {
-    translate([10, -0.1, 28]) grip();
-    translate([10, -0.1, 177]) grip();
+    translate([barDepth - gripDepth - 3, -0.1, 28]) grip();
+    translate([barDepth - gripDepth - 3, -0.1, 177]) grip();
 }
 
 module adaptor() {
@@ -126,14 +126,4 @@ module adaptor() {
     }
 }
 
-module original() {
-    color("blue")
-    rotate([-90,0,0])
-    translate([barLength / 2.0, 4, 10.4])
-    import("soundbar-v1.stl");
-}
-
-//difference() {
-    rotate([90,0,90]) adaptor();
-//    original();
-//}
+rotate([90,0,90]) adaptor();
